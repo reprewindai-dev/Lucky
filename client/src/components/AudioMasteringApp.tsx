@@ -285,13 +285,17 @@ const processAudioPremium = async (audioBuffer: AudioBuffer, preset: any, useAut
   chain.connect(limiter);
   chain = limiter;
 
-  // STAGE 7: Output Gain (final loudness adjustment)
+  // STAGE 7: Output Gain (makeup gain for competitive loudness)
   const outputGain = offlineCtx.createGain();
-  // Proper loudness calculation: convert dB to linear
-  // If target is -9dB, we want output at 0.35 (-9dB = 20*log10(0.35))
-  const targetDB = preset.settings.loudness; // e.g., -9
-  const linearGain = Math.pow(10, targetDB / 20);
-  outputGain.gain.value = Math.max(0.1, Math.min(0.9, linearGain)); // Clamp 0.1-0.9
+  // After compression, we need to BOOST to competitive levels
+  // loudness: -9 = moderate loud, -7 = very loud
+  // Calculate makeup gain: more negative loudness = louder output
+  const targetDB = preset.settings.loudness; // e.g., -9 or -7
+  const makeupBoost = -targetDB; // -9 becomes +9, -7 becomes +7
+  // Convert to linear: +9dB = 2.8x, +7dB = 2.2x
+  const linearGain = Math.pow(10, makeupBoost / 20);
+  // Scale it down slightly to avoid clipping after limiting (0.4x multiplier)
+  outputGain.gain.value = linearGain * 0.4;
   chain.connect(outputGain);
   chain = outputGain;
 
