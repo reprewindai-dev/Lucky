@@ -1,0 +1,129 @@
+**Complete Project Specification for Trap Master Pro Audio Mastering Application**
+
+This document provides comprehensive requirements for developing Trap Master Pro, a browser-based audio mastering application designed specifically for trap music and trap soul genres. The application enables artists to process their freestyle recordings and original tracks with professional-grade mastering tailored to these specific musical styles.
+
+**Application Purpose and Core Functionality**
+
+Trap Master Pro serves as a personal audio mastering tool that allows trap and trap soul artists to upload their raw recordings, apply genre-specific mastering processing, preview the results, and export the mastered audio files in multiple formats. The application operates entirely within the web browser using client-side audio processing, requiring no backend infrastructure or server-side processing. All audio manipulation occurs locally on the user’s device, ensuring complete privacy of unreleased material and enabling offline functionality once the application loads.
+
+**Technical Architecture**
+
+The application should be built as a single-page React application using modern web technologies. The implementation may use either Vite or Next.js as the build framework, with Tailwind CSS handling all styling and layout requirements. The audio processing engine relies on the Web Audio API available in modern browsers, specifically utilizing the OfflineAudioContext for rendering processed audio without real-time playback constraints.
+
+**Audio Format Support and Export Capabilities**
+
+The application must support importing audio files in all common formats including MP3, WAV, M4A, AAC, OGG, FLAC, WMA, AIFF, and OPUS. Users should be able to upload their recordings from any location accessible through the browser file picker on their device.
+
+For export functionality, the application must provide format selection options allowing users to export their mastered tracks in either WAV format for maximum quality or MP3 format for smaller file sizes and easier sharing. The WAV export should produce uncompressed sixteen-bit PCM audio at the original sample rate of the input file. The MP3 export should target high-quality encoding at three hundred twenty kilobits per second or the highest quality available through browser-based encoding mechanisms.
+
+**iOS Safari Export Implementation Requirements**
+
+The export functionality must work reliably on iPhone devices running iOS Safari, which represents a critical use case for the target audience. The implementation must follow a three-tiered approach to ensure compatibility across device constraints. First, the application should attempt to use the native iOS share sheet through the Web Share API when the device and browser support sharing file objects. If the navigator.canShare method indicates that file sharing is supported, the application should create a File object from the processed audio blob and invoke navigator.share to present the iOS share sheet, allowing users to save directly to their Files app, email the track to themselves, or share through Messages and other installed applications.
+
+If the Web Share API is not available or if the user cancels the share action, the application must fall back to same-tab navigation as the most reliable iOS export method. This involves creating a blob URL from the processed audio using URL.createObjectURL and then navigating the current browser tab to that URL using window.location.assign. This approach opens the audio file in the Safari audio player interface where users can access the native iOS share button to save or share the file. The blob URL must remain valid for at least five minutes before being revoked through URL.revokeObjectURL to ensure sufficient time for the user to complete the export process.
+
+The application must never use anchor element download attributes or programmatic click events on iOS, as these mechanisms are unreliable and frequently fail in mobile Safari due to security restrictions and popup blocking policies. For desktop browsers, the traditional download approach using anchor elements with download attributes remains acceptable as a third-tier fallback.
+
+**Video Export and Lyric Video Generation (Advanced Feature)**
+
+The application should include an advanced feature for generating lyric videos from mastered audio tracks. This capability enables artists to create shareable video content for social media platforms directly from the mastering application without requiring separate video editing software.
+
+The lyric video generation system should accept the mastered audio track along with user-provided lyrics text. The implementation should use the Canvas API or similar browser-based rendering technologies to create video frames that synchronize with the audio playback. The visual presentation should feature a dark gradient background consistent with the application’s purple and dark theme, with animated text displaying the lyrics in a readable, stylized font appropriate for trap music aesthetics.
+
+The timing mechanism for lyric display should either utilize automatic syllable detection and rhythm analysis from the audio waveform or provide a simple manual timing interface where users can tap or click to mark lyric phrase boundaries while the audio plays. The system should generate smooth transitions between lyric lines with fade effects or slide animations that maintain visual interest without distracting from the text content.
+
+The video output format should target MP4 with H.264 video encoding and AAC audio encoding for maximum compatibility with social media platforms including Instagram, TikTok, YouTube, and Twitter. The resolution should default to 1080x1080 pixels for square format social media posts or 1920x1080 pixels for landscape format depending on user preference. The frame rate should be thirty frames per second to balance file size with smooth motion.
+
+The video rendering process should provide progress feedback to the user indicating the percentage completion and estimated time remaining, as video encoding in the browser can be computationally intensive and may require several minutes to complete depending on track length and device capabilities. Once rendering completes, the video should be exportable using the same iOS-compatible export mechanisms implemented for audio files, ensuring that users can save the generated video to their device or share it directly to social media applications.
+
+The technical implementation of video generation should utilize either the MediaRecorder API to capture canvas rendering output synchronized with audio playback, or alternatively use a library such as ffmpeg.js compiled to WebAssembly for more sophisticated video encoding capabilities within the browser environment. The selection between these approaches should balance output quality, processing speed, and browser compatibility requirements.
+
+**Audio Processing Specifications for Trap and Trap Soul**
+
+The mastering processing chain must be specifically optimized for the sonic characteristics of trap music and trap soul genres. These styles prioritize powerful low-frequency content from 808 bass drums and sub-bass elements, clear and present vocal performances that convey lyrical content and emotional expression, and the crisp high-frequency detail of hi-hats and percussion that defines the rhythmic feel.
+
+The sub-bass region from twenty to sixty hertz should receive substantial enhancement in the range of five to seven decibels using a low-shelf filter centered at fifty hertz. This ensures that 808 bass drums and sub-bass synthesizer elements achieve the physical impact and rumble that characterizes professional trap productions while remaining audible even on playback systems with limited low-frequency extension.
+
+The bass region from sixty to two hundred fifty hertz should receive additional boost of four to six decibels using a peaking filter centered at one hundred twenty hertz with a Q value of approximately one point two. This frequency range contains the fundamental frequencies of bass instruments and the body of 808 sounds, contributing warmth and punch to the low end without creating the muddiness associated with excessive low-midrange energy.
+
+The low-midrange frequencies from two hundred fifty to five hundred hertz require reduction rather than enhancement to maintain clarity in trap productions. A peaking filter centered at three hundred fifty hertz with a Q value of zero point eight should apply a cut of approximately two decibels. This prevents the accumulation of energy in this problematic frequency range that can make mixes sound boxy, muddy, or cluttered, particularly when multiple melodic elements and layered vocal tracks occupy similar frequency zones.
+
+The midrange frequencies from five hundred hertz to two kilohertz should receive moderate enhancement of three to four decibels using a peaking filter centered at one thousand hertz with a Q value of zero point seven. This region contains essential information for melodic instruments and the fundamental body of vocal performances, and appropriate enhancement ensures these elements remain present and clear in the final mix without becoming harsh or fatiguing.
+
+The vocal presence region from two to five kilohertz deserves particular attention in trap soul music where vocal performance carries significant artistic weight. A peaking filter centered at three thousand hertz with a Q value of one point five should apply enhancement of five to six decibels. This targeted boost ensures that vocals cut through dense instrumental arrangements and remain intelligible across various playback systems while maintaining the emotional impact and intimacy characteristic of trap soul vocal performances.
+
+The sibilance region from five to eight kilohertz requires dynamic control through de-essing processing to prevent harsh, piercing quality from excessive high-frequency energy in vocal consonants. The implementation should monitor this frequency range and apply dynamic gain reduction of three to five decibels when sibilant content exceeds the threshold, effectively smoothing harsh “s” and “sh” sounds without dulling the overall brightness of the vocal performance. This processing should only activate when sibilance is detected, avoiding unnecessary reduction of non-sibilant high-frequency content.
+
+The high-frequency region from eight to twelve kilohertz should receive enhancement of two to four decibels using a high-shelf filter centered at ten thousand hertz. This adds air, shimmer, and openness to the overall production, emphasizing the brightness of hi-hats, shakers, and the breathiness of vocal performances that contribute to the polished, contemporary sound expected in modern trap music.
+
+The dynamics processing should employ multi-band compression to control level variations independently across different frequency ranges. The low-frequency band below two hundred fifty hertz should utilize aggressive compression with a ratio of four to six to one, a threshold of negative thirty decibels, a fast attack time of ten milliseconds, and a release time of one hundred fifty milliseconds. This ensures consistent bass impact without allowing peaks that would limit the overall loudness of the master.
+
+The midrange frequencies from two hundred fifty hertz to five kilohertz should receive moderate compression with a ratio of three to four to one, a threshold of negative twenty-four decibels, an attack time of five milliseconds, and a release time of one hundred milliseconds. This maintains appropriate dynamic control while preserving some natural variation that contributes to musical expression.
+
+The high-frequency content above five kilohertz requires lighter compression with a ratio of two to three to one, a threshold of negative twenty decibels, an attack time of one millisecond, and a release time of fifty milliseconds. This preserves the transient attack of hi-hats and percussion that defines the rhythmic character of trap productions while preventing excessive peaks.
+
+The stereo imaging processing should create width and spaciousness in the upper frequency ranges while maintaining a solid mono or narrow stereo image for bass elements and lead vocals. The widening algorithm should primarily affect content above three hundred hertz, with the degree of enhancement scaled according to preset selection. The stereo width factor should multiply the left and right channel gains by values ranging from one point three to one point five depending on the desired intensity, creating an immersive soundstage while ensuring mono compatibility for playback systems that sum stereo content to mono.
+
+The final limiting stage should target integrated loudness levels of negative eight to negative nine LUFS to achieve competitive loudness matching commercial trap releases on streaming platforms. The brick-wall limiter should employ a fast attack time of zero point five to one millisecond to catch transient peaks from drum hits, a release time of eighty to one hundred milliseconds to maintain the rhythmic pulse of the production, and a ceiling of negative zero point three to negative zero point five decibels true peak to provide headroom for codec artifacts during streaming encoding.
+
+**Mastering Presets**
+
+The application must provide four distinct mastering presets optimized for different aspects of trap and trap soul production. Each preset applies the processing chain described above with parameter variations suited to specific production characteristics.
+
+The Balanced Trap preset delivers a clean, professional mix with balanced frequency response suitable for vocal-focused tracks where lyrical content and melodic elements share equal importance with rhythmic and bass components. This preset uses moderate bass enhancement of four decibels in the sub-bass region and five decibels in the bass region, midrange clarity boost of three decibels, vocal presence enhancement of four decibels, high-frequency shine of two decibels, moderate compression with a ratio of three to one, moderate stereo widening with a width factor of one point three, and a loudness target of negative eight LUFS.
+
+The Heavy 808s preset maximizes bass impact with aggressive compression for hard-hitting trap productions that prioritize low-frequency power and rhythmic intensity over vocal nuance. This preset employs maximum bass enhancement of seven decibels in the sub-bass region and six decibels in the bass region, reduced midrange emphasis of two decibels to prevent frequency masking of bass elements, enhanced high-frequency detail of three decibels to maintain clarity despite the powerful low end, aggressive compression with a ratio of five to one, narrower stereo image with a width factor of one point two to keep the bass focused and powerful, and a loudness target of negative seven LUFS for maximum competitive impact.
+
+The Vocal Focus preset emphasizes vocal presence and clarity to ensure lyrics remain front and center in the mix. This preset uses conservative bass enhancement of three decibels in both sub-bass and bass regions to provide foundation without overwhelming the vocal performance, maximum midrange clarity boost of five decibels, maximum vocal presence enhancement of seven decibels centered at three kilohertz, enhanced high-frequency detail of four decibels for vocal air and breathiness, lighter compression with a ratio of two point five to one to preserve vocal dynamics and expression, wider stereo image with a width factor of one point four to create space around the vocal, and a conservative loudness target of negative nine LUFS to maintain dynamic range and emotional impact.
+
+The Modern Trap preset delivers contemporary streaming-ready sound with wide stereo imaging and punchy dynamics that match current commercial releases. This preset balances all processing parameters for versatility across different trap subgenres, using substantial bass enhancement of six decibels in the sub-bass region and five decibels in the bass region, strong midrange clarity of four decibels, solid vocal presence of six decibels, moderate high-frequency shine of three point five decibels, balanced compression with a ratio of four to one, maximum stereo width with a factor of one point five for an immersive listening experience, and a loudness target of negative eight point five LUFS to match streaming platform normalization standards.
+
+**User Interface Design and Workflow**
+
+The visual design should employ a dark gradient background transitioning from dark gray through deep purple tones, creating an aesthetic appropriate for trap music culture while maintaining professional polish. The primary accent color should be vibrant purple with pink gradient accents for interactive elements and call-to-action buttons. All text should use white or light purple colors for optimal readability against the dark background.
+
+The initial screen should present a large upload zone with a dashed purple border featuring an upload icon, clear explanatory text indicating supported file formats, and a hidden file input element that activates when users click or tap anywhere within the upload zone. This provides an intuitive entry point requiring no explanation or instructions.
+
+After file upload begins, the application should display a processing indicator with an animated spinner and clear text explaining that professional mastering processing is being applied to the track. This reassures users that the application is actively working while the Web Audio API renders the four preset variations.
+
+Once processing completes, the interface should transition to the mastering control screen displaying the track filename and duration, a prominent button for changing to a different audio file, and a grid of four preset selection cards arranged in two rows. Each preset card should show the preset name as a bold heading, a descriptive subtitle explaining the sonic characteristics and ideal use cases, and a colored border that highlights when selected. The cards should use subtle hover effects on desktop and clear visual feedback on mobile to indicate interactivity.
+
+Below the preset selection, the interface should present a format selection area with two buttons allowing users to choose between WAV format for highest quality or MP3 format for smaller file size and easier sharing. Each format button should display the format name and a brief explanation of its characteristics. The selected format should be visually highlighted with the purple accent color.
+
+The playback controls should appear as a horizontal bar featuring a large circular play or pause button depending on playback state, a progress bar showing the current playback position with a draggable indicator, and time displays showing both elapsed time and total track duration in minutes and seconds format. This allows users to preview the mastered result before committing to export.
+
+The export button should be prominently displayed as a full-width element with a gradient background transitioning from purple to pink, featuring a download icon and clear text that reads either “Share Mastered Track” when the Web Share API is available or “Export Mastered Track” when using the fallback method. The button text should dynamically adapt based on detected device capabilities to set appropriate user expectations.
+
+A settings panel below the export button should display the currently selected preset name with a settings icon and show visual indicators of the processing parameters being applied. These should appear as labeled progress bars showing the relative intensity of bass boost, mid clarity, high shine, compression, stereo width, and loudness for the selected preset. This provides transparency about the processing being applied and helps users understand the differences between presets.
+
+**Advanced Features: Lyric Video Interface**
+
+When the user activates the lyric video generation feature, the interface should present an additional panel with controls for video creation. This panel should include a text area where users can paste or type their lyrics with each line on a separate line of text, a timing method selector allowing users to choose between automatic timing based on audio analysis or manual timing through tap-based marking, and video format options for selecting output resolution and aspect ratio.
+
+If manual timing is selected, the interface should provide a simple timing tool displaying the lyrics text with the audio playback controls and a large tap button. As the audio plays, users tap the button at the moment each lyric line should appear, and the application records these timestamps for later use during video rendering. The interface should allow users to preview the timing by playing back the audio with the lyrics appearing according to the recorded timestamps, with options to reset and re-record timing if the initial attempt is unsatisfactory.
+
+Once timing is set and the user initiates video rendering, a progress panel should appear displaying a progress bar, percentage completion, estimated time remaining, and status messages indicating the current stage of rendering. After rendering completes, the interface should provide a video preview player allowing users to review the final result before export, along with export buttons using the same iOS-compatible export mechanisms implemented for audio files.
+
+**File Naming and Organization**
+
+All exported files should use descriptive filenames that include the preset name and original filename to help users organize their mastered tracks. The filename format should follow the pattern “mastered_PresetName_OriginalFilename.extension” with spaces in the preset name replaced by underscores and special characters sanitized to ensure compatibility across different operating systems and file systems. The filename length should be constrained to one hundred twenty characters maximum to prevent issues with filesystem limitations while retaining sufficient descriptive information.
+
+**Browser Compatibility and Performance**
+
+The application must function correctly in modern versions of Safari on iOS, Chrome on desktop and Android, Firefox on desktop and Android, and Edge on desktop. The implementation should include feature detection for Web Audio API support, Web Share API support, and Canvas API support where required, with graceful degradation or clear error messages when essential features are unavailable.
+
+The audio processing should optimize for performance by using appropriate sample rates, bit depths, and buffer sizes that balance quality with processing speed. On mobile devices with limited computational power, the application should provide feedback indicating that processing may take longer than on desktop systems while still producing identical results.
+
+**Privacy and Data Security**
+
+The application must clearly communicate that all processing occurs locally on the user’s device and that no audio files are uploaded to external servers or transmitted over the network. This ensures complete privacy for artists working with unreleased material and eliminates concerns about unauthorized distribution or intellectual property theft. The application should include visible text in the footer or about section explicitly stating this privacy guarantee.
+
+**Documentation and User Guidance**
+
+The application should include brief contextual help text at key interaction points explaining how to use each feature without overwhelming users with excessive documentation. When the iOS export method uses same-tab navigation, the interface should display a temporary instructional message explaining that users should tap the Share icon in Safari and select their desired destination to save or share the mastered track.
+
+**Project Naming and Branding**
+
+The application should be named “Trap Master Pro” throughout all user-facing text and documentation. The project repository or deployment should use the identifier “trap-master-pro-private” to indicate its status as a private personal tool rather than a commercial service. The branding should maintain consistency with trap music culture and aesthetics while projecting professional quality and reliability.
+
+This comprehensive specification provides all necessary information for implementing Trap Master Pro as a fully functional audio mastering application with export capabilities optimized for iOS devices and optional advanced features for lyric video generation. The implementation should prioritize reliability, ease of use, and professional audio quality while respecting the technical constraints of browser-based audio processing and mobile device limitations.​​​​​​​​​​​​​​​​

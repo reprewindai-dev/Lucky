@@ -5,7 +5,7 @@
   "outputDirectory": "dist/public",
   "functions": {
     "api/index.ts": {
-      "runtime": "vercel-node@1.0.0"
+      "runtime": "nodejs20.x"
     }
   },
   "rewrites": [
