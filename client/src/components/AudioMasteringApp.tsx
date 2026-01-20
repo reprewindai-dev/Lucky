@@ -473,7 +473,7 @@ export default function AudioMasteringApp() {
 
         {!audioBuffer ? (
           <div className="relative group overflow-hidden rounded-[2.5rem] bg-[#0a0a0a] border border-white/5 p-20 text-center transition-all hover:border-purple-500/40">
-            <input type="file" accept="audio/*,video/*" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
+            <input type="file" accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.wma,.aiff,.mp4,.mov,.avi,.mkv,.webm" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
             <div className="space-y-6">
               <div className="w-20 h-20 mx-auto bg-white/5 rounded-3xl flex items-center justify-center group-hover:bg-purple-500/10 transition-colors">
                 <Upload className="w-8 h-8 text-gray-400 group-hover:text-purple-400 transition-colors" />
