@@ -5,107 +5,202 @@ import { useTracks } from '@/hooks/use-tracks';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- Premium Preset Definitions (Urban/Trap Optimized) ---
+// --- CORRECTED PRESET DEFINITIONS ---
 const presets = {
-  deharsh: {
-    name: "De-Harsh",
-    intent: "Control aggressive high-end transients",
-    description: "Tames harsh 2.5-6kHz zones without losing energy.",
-    settings: { bass: 0, mid: -1, high: -3, compression: 4, loudness: -9 }
-  },
-  mudremover: {
-    name: "Mud Remover",
-    intent: "Clean up the 150-350Hz region",
-    description: "Removes low-mid buildup to let the kick breathe.",
-    settings: { bass: -2, mid: 2, high: 1, compression: 2, loudness: -9 }
-  },
-  basstamer: {
-    name: "Bass Tamer",
-    intent: "Stabilize wild 808s",
-    description: "Heavy compression on lows with tight sub-filtering.",
-    settings: { bass: 4, mid: 0, high: 0, compression: 6, loudness: -9 }
-  },
-  vintage: {
-    name: "Vintage Warmth",
-    intent: "Analog saturation feel",
-    description: "Warm lows and softened highs for a classic vibe.",
-    settings: { bass: 3, mid: 1, high: -2, compression: 3, loudness: -9 }
-  },
-  modern: {
-    name: "Modern Bright",
-    intent: "Airy, high-definition sheen",
-    description: "12kHz+ air shelf for that expensive studio feel.",
-    settings: { bass: 1, mid: 0, high: 4, compression: 3, loudness: -9 }
-  },
-  lofi: {
-    name: "Lo-Fi Character",
-    intent: "Gritty, textured sound",
-    description: "Limited bandwidth and subtle pumping effects.",
-    settings: { bass: 2, mid: -2, high: -4, compression: 5, loudness: -10 }
-  },
-  neosoul: {
-    name: "Neo Soul",
-    intent: "Deep, organic resonance",
-    description: "Focus on warm mids and wide stereo depth.",
-    settings: { bass: 2, mid: 3, high: 1, compression: 2, loudness: -9 }
-  },
-  festival: {
-    name: "Festival Banger",
-    intent: "Maximum energy and impact",
-    description: "Aggressive limiting and sub-bass enhancement.",
-    settings: { bass: 5, mid: 2, high: 3, compression: 7, loudness: -8.5 }
-  },
-  focus: {
-    name: "Focus Center",
-    intent: "Mono-compatible punch",
-    description: "Tightens the stereo field for ultimate impact.",
-    settings: { bass: 1, mid: 2, high: 0, compression: 4, loudness: -9 }
-  },
-  immersive: {
-    name: "Immersive",
-    intent: "3D Spatial depth",
-    description: "Mid-Side rules applied for wrap-around sound.",
-    settings: { bass: 0, mid: 1, high: 3, compression: 2, loudness: -9 }
-  },
-  wide: {
-    name: "Wide & Spacious",
-    intent: "Extreme stereo width",
-    description: "Pushes high-end elements to the edges.",
-    settings: { bass: -1, mid: 0, high: 4, compression: 2, loudness: -9 }
-  },
-  vocalforward: {
-    name: "Vocal Forward",
-    intent: "Lyrics front and center",
-    description: "Boosts 1-4kHz presence and controls sub-mud.",
-    settings: { bass: 1, mid: 5, high: 2, compression: 4, loudness: -9 }
-  },
   smoothmids: {
     name: "Smooth Mids",
     intent: "Velvet frequency response",
-    description: "Diplomatic approach to the mid-range.",
-    settings: { bass: 1, mid: -2, high: 1, compression: 3, loudness: -9 }
+    description: "Warm, smooth midrange without harshness.",
+    settings: {
+      bass: 1,
+      mid: 2, // Boost for warmth (was -2, wrong!)
+      midFreq: 800, // Warm low-mids
+      high: 0,
+      ratio: 2.5,
+      loudness: -9,
+      subEQ: { freq: 3500, q: 2.0, gain: -2 } // Reduce upper mid harshness
+    }
   },
   dynamic: {
     name: "Dynamic & Clear",
     intent: "Preserve transients",
-    description: "Light compression with high-end clarity.",
-    settings: { bass: 0, mid: 1, high: 2, compression: 1.5, loudness: -9.5 }
+    description: "Minimal compression, natural punch.",
+    settings: {
+      bass: 0,
+      mid: 0,
+      high: 2,
+      ratio: 1.5, // Very light compression
+      loudness: -10 // Quieter to preserve dynamics
+    }
   },
   maximpact: {
     name: "Maximum Impact",
     intent: "Loud, punchy, aggressive",
-    description: "Optimized for club systems and high volume.",
-    settings: { bass: 4, mid: 3, high: 3, compression: 6, loudness: -8.5 }
+    description: "Controlled loudness without distortion.",
+    settings: {
+      bass: 3,
+      mid: 2,
+      midFreq: 2000, // Punch frequency
+      high: 2,
+      ratio: 3.5, // Moderate compression for control
+      loudness: -7 // Louder target
+    }
+  },
+  modern: {
+    name: "Modern Bright",
+    intent: "Airy, high-definition sheen",
+    description: "Open highs without harshness.",
+    settings: {
+      bass: 0,
+      mid: 0,
+      high: 3, // Air boost
+      ratio: 2.0,
+      loudness: -9,
+      subEQ: { freq: 5000, q: 1.5, gain: -1.5 } // Tame harsh sibilance
+    }
+  },
+  lofi: {
+    name: "Lo-Fi Character",
+    intent: "Gritty, textured sound",
+    description: "Controlled saturation and compression.",
+    settings: {
+      bass: 2,
+      mid: 0,
+      high: -4, // Roll off highs for lo-fi feel
+      ratio: 3.0, // More compression for "pumping"
+      loudness: -10
+    }
+  },
+  neosoul: {
+    name: "Neo Soul",
+    intent: "Deep, organic resonance",
+    description: "Warm mids, soft highs, musical compression.",
+    settings: {
+      bass: 3, // Warm low end
+      mid: 3,
+      midFreq: 600, // Warm, full mids
+      high: -1, // Soft highs
+      ratio: 2.0, // Gentle compression
+      loudness: -9
+    }
+  },
+  festival: {
+    name: "Festival Banger",
+    intent: "Maximum energy and impact",
+    description: "Loud but stable, controlled bass.",
+    settings: {
+      bass: 4,
+      mid: 2,
+      high: 2,
+      ratio: 3.5, // Strong compression for consistency
+      loudness: -7 // Loud
+    }
+  },
+  focus: {
+    name: "Focus Center",
+    intent: "Mono-compatible punch",
+    description: "Center-focused, strong mono image.",
+    settings: {
+      bass: 2,
+      mid: 3,
+      midFreq: 1000, // Center energy
+      high: 0,
+      ratio: 2.5,
+      loudness: -9
+    }
+  },
+  immersive: {
+    name: "Immersive",
+    intent: "3D Spatial depth",
+    description: "Subtle width, clear space.",
+    settings: {
+      bass: 0,
+      mid: 1,
+      high: 3, // Air for space
+      ratio: 2.0, // Light compression preserves space
+      loudness: -9
+    }
+  },
+  wide: {
+    name: "Wide & Spacious",
+    intent: "Extreme stereo width",
+    description: "Wide but mono-safe.",
+    settings: {
+      bass: -1, // Reduce bass width
+      mid: 0,
+      high: 4, // Wide highs
+      ratio: 2.0,
+      loudness: -9
+    }
+  },
+  vocalforward: {
+    name: "Vocal Forward",
+    intent: "Lyrics front and center",
+    description: "Vocal clarity without harshness.",
+    settings: {
+      bass: 0,
+      mid: 4,
+      midFreq: 3000, // Vocal presence (was 1500, too nasal!)
+      high: 1,
+      ratio: 2.5,
+      loudness: -9,
+      subEQ: { freq: 250, q: 1.0, gain: -2 } // Remove mud from vocals
+    }
   },
   bigcappo: {
     name: "BigCappo (Signature)",
     intent: "Emotional, human Trap-Soul",
-    description: "Soft auto-tune feel with warm, expressive mids.",
-    settings: { bass: 3, mid: 4, high: 1, compression: 3, loudness: -9, special: "bigcappo" }
+    description: "Natural warmth, expressive dynamics.",
+    settings: {
+      bass: 3, // Warm low end
+      mid: 3,
+      midFreq: 800, // Warm, emotional mids
+      high: 1,
+      ratio: 2.0, // Light compression preserves emotion
+      loudness: -9
+    }
+  },
+  deharsh: {
+    name: "De-Harsh",
+    intent: "Control aggressive high-end",
+    description: "Tame harshness, keep energy.",
+    settings: {
+      bass: 0,
+      mid: 0,
+      high: -2, // Reduce harsh highs
+      ratio: 2.5,
+      loudness: -9,
+      subEQ: { freq: 4000, q: 2.5, gain: -4 } // Surgically remove harshness
+    }
+  },
+  mudremover: {
+    name: "Mud Remover",
+    intent: "Clean up low-mid buildup",
+    description: "Clear, tight low end.",
+    settings: {
+      bass: -1,
+      mid: 1,
+      high: 1,
+      ratio: 2.0,
+      loudness: -9,
+      subEQ: { freq: 250, q: 1.5, gain: -3 } // Remove mud at 250Hz
+    }
+  },
+  vintage: {
+    name: "Vintage Warmth",
+    intent: "Analog saturation feel",
+    description: "Warm lows, soft highs.",
+    settings: {
+      bass: 3,
+      mid: 1,
+      high: -2, // Soften highs
+      ratio: 2.5,
+      loudness: -9
+    }
   }
 };
 
-// --- Advanced Audio Analysis & Processing ---
+// --- CORRECTED MASTERING ENGINE ---
 const processAudioPremium = async (audioBuffer: AudioBuffer, preset: any, useAutoTune = false) => {
   const offlineCtx = new OfflineAudioContext(audioBuffer.numberOfChannels, audioBuffer.length, audioBuffer.sampleRate);
   const source = offlineCtx.createBufferSource();
@@ -113,67 +208,95 @@ const processAudioPremium = async (audioBuffer: AudioBuffer, preset: any, useAut
 
   let chain: AudioNode = source;
 
-  // 1. Sub-Bass Tightening (Pink Noise Optimization)
-  const subFilter = offlineCtx.createBiquadFilter();
-  subFilter.type = 'highpass'; subFilter.frequency.value = 30; subFilter.Q.value = 0.7;
-  chain.connect(subFilter);
-  chain = subFilter;
+  // STAGE 1: Input Trim (normalize to -6dBFS headroom)
+  const inputGain = offlineCtx.createGain();
+  let peakLevel = 0;
+  for (let ch = 0; ch < audioBuffer.numberOfChannels; ch++) {
+    const channelData = audioBuffer.getChannelData(ch);
+    for (let i = 0; i < channelData.length; i++) {
+      peakLevel = Math.max(peakLevel, Math.abs(channelData[i]));
+    }
+  }
+  // Target -6dB input = 0.5 in linear (gives headroom for processing)
+  const inputTrim = peakLevel > 0 ? (0.5 / peakLevel) : 1.0;
+  inputGain.gain.value = inputTrim;
+  chain.connect(inputGain);
+  chain = inputGain;
 
-  // 2. Adaptive DSP based on Preset Intent
-  if (preset.settings.special === "bigcappo" || useAutoTune) {
-    const pitchNode = offlineCtx.createBiquadFilter();
-    pitchNode.type = 'peaking';
-    pitchNode.frequency.value = 400;
-    pitchNode.gain.value = -2; // Warmth reduction
-    chain.connect(pitchNode);
-    chain = pitchNode;
+  // STAGE 2: Sub-Bass HPF (remove rumble below 30Hz)
+  const hpf = offlineCtx.createBiquadFilter();
+  hpf.type = 'highpass';
+  hpf.frequency.value = 30;
+  hpf.Q.value = 0.707; // Butterworth response
+  chain.connect(hpf);
+  chain = hpf;
+
+  // STAGE 3: Subtractive EQ (problem frequency removal)
+  if (preset.settings.subEQ) {
+    const subEQ = offlineCtx.createBiquadFilter();
+    subEQ.type = 'peaking';
+    subEQ.frequency.value = preset.settings.subEQ.freq;
+    subEQ.Q.value = preset.settings.subEQ.q;
+    subEQ.gain.value = preset.settings.subEQ.gain; // should be negative
+    chain.connect(subEQ);
+    chain = subEQ;
   }
 
-  // 3. Spectral Balance (Low/Mid/High)
-  const bassFilter = offlineCtx.createBiquadFilter();
-  bassFilter.type = 'lowshelf'; bassFilter.frequency.value = 120; bassFilter.gain.value = preset.settings.bass;
-  chain.connect(bassFilter);
-  chain = bassFilter;
+  // STAGE 4: Tone Shaping EQ (Low/Mid/High)
+  const bassShelf = offlineCtx.createBiquadFilter();
+  bassShelf.type = 'lowshelf';
+  bassShelf.frequency.value = 100; // Bass shelf at 100Hz
+  bassShelf.gain.value = preset.settings.bass;
+  chain.connect(bassShelf);
+  chain = bassShelf;
 
-  const midFilter = offlineCtx.createBiquadFilter();
-  midFilter.type = 'peaking'; midFilter.frequency.value = 1500; midFilter.gain.value = preset.settings.mid;
-  chain.connect(midFilter);
-  chain = midFilter;
+  const midPeak = offlineCtx.createBiquadFilter();
+  midPeak.type = 'peaking';
+  midPeak.frequency.value = preset.settings.midFreq || 1500; // Adjustable mid frequency
+  midPeak.Q.value = 1.0;
+  midPeak.gain.value = preset.settings.mid;
+  chain.connect(midPeak);
+  chain = midPeak;
 
-  const highFilter = offlineCtx.createBiquadFilter();
-  highFilter.type = 'highshelf'; highFilter.frequency.value = 12000; highFilter.gain.value = preset.settings.high; // Air Shelf
-  chain.connect(highFilter);
-  chain = highFilter;
+  const highShelf = offlineCtx.createBiquadFilter();
+  highShelf.type = 'highshelf';
+  highShelf.frequency.value = 8000; // Air shelf at 8kHz (more musical than 12k)
+  highShelf.gain.value = preset.settings.high;
+  chain.connect(highShelf);
+  chain = highShelf;
 
-  // 4. Adaptive Multiband-Style Compression
-  const compressor = offlineCtx.createDynamicsCompressor();
-  compressor.threshold.value = -24; 
-  compressor.knee.value = 30;
-  // Keep ratios sane: aggressive settings can get ugly fast on phone speakers.
-  compressor.ratio.value = Math.min(6, Math.max(1.5, 2 + (preset.settings.compression)));
-  compressor.attack.value = 0.003; 
-  compressor.release.value = 0.25;
-  chain.connect(compressor);
-  chain = compressor;
+  // STAGE 5: Compression (single stage, musical settings)
+  const comp = offlineCtx.createDynamicsCompressor();
+  comp.threshold.value = -20; // Gentle threshold
+  comp.knee.value = 12; // Soft knee for musicality
+  comp.ratio.value = Math.min(4, Math.max(1.5, preset.settings.ratio)); // Max 4:1
+  comp.attack.value = 0.010; // 10ms - musical for transients
+  comp.release.value = 0.150; // 150ms - natural release
+  chain.connect(comp);
+  chain = comp;
 
-  // 5. Look-ahead Peak Limiting
+  // STAGE 6: Output Limiter (safety only, not for loudness)
   const limiter = offlineCtx.createDynamicsCompressor();
-  // WebAudio "compressor" is not a true brickwall limiter, so avoid extreme makeup gain.
-  limiter.threshold.value = Math.min(-1, Math.max(-12, preset.settings.loudness));
-  limiter.knee.value = 0; 
-  limiter.ratio.value = 20;
-  limiter.attack.value = 0.001; 
-  limiter.release.value = 0.1;
+  limiter.threshold.value = -0.5; // Catch peaks only
+  limiter.knee.value = 0.5; // Very soft knee
+  limiter.ratio.value = 20; // Hard limiting
+  limiter.attack.value = 0.001; // Fast attack for peaks
+  limiter.release.value = 0.100; // Quick release
   chain.connect(limiter);
   chain = limiter;
 
-  // 6. Premium Gain Staging (0.85 Multiplier for Headroom)
-  const makeupGain = offlineCtx.createGain();
-  // Mobile-friendly headroom: cap makeup gain so we don't explode iOS Safari.
-  const targetGain = Math.pow(10, Math.abs(preset.settings.loudness) / 20) * 0.6;
-  makeupGain.gain.value = Math.min(1.25, Math.max(0.8, targetGain));
-  chain.connect(makeupGain);
-  makeupGain.connect(offlineCtx.destination);
+  // STAGE 7: Output Gain (final loudness adjustment)
+  const outputGain = offlineCtx.createGain();
+  // Proper loudness calculation: convert dB to linear
+  // If target is -9dB, we want output at 0.35 (-9dB = 20*log10(0.35))
+  const targetDB = preset.settings.loudness; // e.g., -9
+  const linearGain = Math.pow(10, targetDB / 20);
+  outputGain.gain.value = Math.max(0.1, Math.min(0.9, linearGain)); // Clamp 0.1-0.9
+  chain.connect(outputGain);
+  chain = outputGain;
+
+  // Connect to destination
+  chain.connect(offlineCtx.destination);
 
   source.start(0);
   return await offlineCtx.startRendering();
@@ -432,7 +555,7 @@ export default function AudioMasteringApp() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const exportAudio = async (format: 'wav' | 'mp3' = 'wav') => {
+  const exportAudio = async () => {
     if (!processedBuffer || !file) return;
     setIsProcessing(true);
     try {
@@ -440,11 +563,13 @@ export default function AudioMasteringApp() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `trapmaster-pro-${selectedPreset}-${file.name.split('.')[0]}.${format}`;
+      a.download = `trapmaster-pro-${selectedPreset}-${file.name.split('.')[0]}.wav`;
       a.click();
-      toast({ title: "Mastering Complete", description: "High-definition export started." });
+      URL.revokeObjectURL(url); // Clean up memory
+      toast({ title: "Export Complete", description: `Mastered audio saved as WAV` });
     } catch (e) {
-      toast({ title: "Export Error", description: "System failure during bounce.", variant: "destructive" });
+      console.error("Export error:", e);
+      toast({ title: "Export Error", description: "Failed to export audio. Please try again.", variant: "destructive" });
     } finally {
       setIsProcessing(false);
     }
@@ -592,14 +717,10 @@ export default function AudioMasteringApp() {
                 ))}
               </div>
 
-              <div className="pt-6 grid grid-cols-2 gap-4">
-                <button onClick={() => exportAudio('wav')} className="p-6 bg-[#0a0a0a] border border-white/5 rounded-[2rem] font-black text-[10px] uppercase tracking-widest hover:bg-white/5 transition-all flex flex-col items-center gap-3 group">
-                  <Download className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
-                  HD WAV
-                </button>
-                <button onClick={() => exportAudio('mp3')} className="p-6 bg-[#0a0a0a] border border-white/5 rounded-[2rem] font-black text-[10px] uppercase tracking-widest hover:bg-white/5 transition-all flex flex-col items-center gap-3 group">
-                  <Download className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
-                  Hi-Fi MP3
+              <div className="pt-6">
+                <button onClick={exportAudio} disabled={isProcessing || !processedBuffer} className="w-full p-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-[2rem] font-black text-sm uppercase tracking-widest hover:from-purple-600 hover:to-pink-600 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed">
+                  <Download className="w-6 h-6" />
+                  Export Mastered WAV
                 </button>
               </div>
             </div>
