@@ -201,6 +201,225 @@ const MB_XOVERS: [number, number, number, number] = [120, 400, 2500, 6000];
 
 // ---------- Exact "spec" presets (the ones you demanded precision for) ----------
 const EXACT_PRESETS: Partial<Record<keyof typeof presets, Partial<PresetDSP>>> = {
+  // ---- Harshness control (2.5k–6k) ----
+  deharsh: {
+    eq: [
+      { type: 'hpf', freq: 35, order: 2, q: 0.707 },
+      { type: 'bell', freq: 3500, gainDb: -3.0, q: 2.2 },
+      { type: 'bell', freq: 5600, gainDb: -2.0, q: 2.0 },
+      { type: 'highshelf', freq: 12000, gainDb: +0.5, q: 0.7 },
+    ],
+    multiband: {
+      xoversHz: MB_XOVERS,
+      bands: [
+        { ratio: 2.2, thresholdDb: -24, kneeDb: 3, attackSec: 0.030, releaseSec: 0.14 },
+        { ratio: 2.0, thresholdDb: -22, kneeDb: 3, attackSec: 0.020, releaseSec: 0.13 },
+        { ratio: 1.6, thresholdDb: -20, kneeDb: 3, attackSec: 0.012, releaseSec: 0.11 },
+        { ratio: 1.5, thresholdDb: -18, kneeDb: 3, attackSec: 0.006, releaseSec: 0.09 },
+        { ratio: 1.4, thresholdDb: -18, kneeDb: 3, attackSec: 0.003, releaseSec: 0.08 },
+      ]
+    },
+    stereo: { monoBelowHz: 120, overallWidth: 108 },
+    output: UNIVERSAL_OUTPUT,
+  },
+
+  // ---- Low-mid cleanup (150–350) ----
+  mudremover: {
+    eq: [
+      { type: 'hpf', freq: 30, order: 2, q: 0.707 },
+      { type: 'bell', freq: 250, gainDb: -3.0, q: 1.6 },
+      { type: 'bell', freq: 420, gainDb: -1.5, q: 1.4 },
+      { type: 'highshelf', freq: 10000, gainDb: +0.5, q: 0.7 },
+    ],
+    multiband: {
+      xoversHz: MB_XOVERS,
+      bands: [
+        { ratio: 2.6, thresholdDb: -25, kneeDb: 3, attackSec: 0.030, releaseSec: 0.15 },
+        { ratio: 2.2, thresholdDb: -23, kneeDb: 3, attackSec: 0.020, releaseSec: 0.14 },
+        { ratio: 1.6, thresholdDb: -20, kneeDb: 3, attackSec: 0.012, releaseSec: 0.12 },
+        { ratio: 1.4, thresholdDb: -18, kneeDb: 3, attackSec: 0.006, releaseSec: 0.10 },
+        { ratio: 1.3, thresholdDb: -18, kneeDb: 3, attackSec: 0.003, releaseSec: 0.09 },
+      ]
+    },
+    stereo: { monoBelowHz: 120, overallWidth: 108 },
+    output: UNIVERSAL_OUTPUT,
+  },
+
+  // ---- 808 / sub stabilization ----
+  basstamer: {
+    eq: [
+      { type: 'hpf', freq: 30, order: 2, q: 0.707 },
+      { type: 'lowshelf', freq: 80, gainDb: +1.0, q: 0.9 },
+      { type: 'bell', freq: 60, gainDb: -1.5, q: 2.0 },
+      { type: 'bell', freq: 140, gainDb: -2.5, q: 1.6 },
+      { type: 'bell', freq: 3000, gainDb: +0.5, q: 1.2 },
+    ],
+    multiband: {
+      xoversHz: MB_XOVERS,
+      bands: [
+        { ratio: 4.5, thresholdDb: -28, kneeDb: 3, attackSec: 0.020, releaseSec: 0.12 },
+        { ratio: 3.0, thresholdDb: -25, kneeDb: 3, attackSec: 0.015, releaseSec: 0.12 },
+        { ratio: 1.8, thresholdDb: -21, kneeDb: 3, attackSec: 0.010, releaseSec: 0.11 },
+        { ratio: 1.6, thresholdDb: -19, kneeDb: 3, attackSec: 0.006, releaseSec: 0.09 },
+        { ratio: 1.4, thresholdDb: -19, kneeDb: 3, attackSec: 0.003, releaseSec: 0.08 },
+      ]
+    },
+    stereo: { monoBelowHz: 140, overallWidth: 105 },
+    output: UNIVERSAL_OUTPUT,
+  },
+
+  // ---- Vintage warmth: soften top, add low-mid body ----
+  vintage: {
+    eq: [
+      { type: 'hpf', freq: 35, order: 2, q: 0.707 },
+      { type: 'lowshelf', freq: 110, gainDb: +1.5, q: 0.9 },
+      { type: 'bell', freq: 900, gainDb: +1.0, q: 1.0 },
+      { type: 'highshelf', freq: 9000, gainDb: -1.5, q: 0.7 },
+    ],
+    multiband: {
+      xoversHz: MB_XOVERS,
+      bands: [
+        { ratio: 2.6, thresholdDb: -25, kneeDb: 3, attackSec: 0.030, releaseSec: 0.16 },
+        { ratio: 2.1, thresholdDb: -23, kneeDb: 3, attackSec: 0.020, releaseSec: 0.15 },
+        { ratio: 1.6, thresholdDb: -20, kneeDb: 3, attackSec: 0.012, releaseSec: 0.13 },
+        { ratio: 1.4, thresholdDb: -18, kneeDb: 3, attackSec: 0.008, releaseSec: 0.11 },
+        { ratio: 1.3, thresholdDb: -18, kneeDb: 3, attackSec: 0.005, releaseSec: 0.10 },
+      ]
+    },
+    stereo: { monoBelowHz: 120, overallWidth: 106 },
+    output: UNIVERSAL_OUTPUT,
+  },
+
+  // ---- Modern bright: air + clarity, controlled low-mid ----
+  modern: {
+    eq: [
+      { type: 'hpf', freq: 35, order: 2, q: 0.707 },
+      { type: 'bell', freq: 300, gainDb: -1.5, q: 2.0 },
+      { type: 'highshelf', freq: 12000, gainDb: +2.0, q: 0.7 },
+      { type: 'bell', freq: 4000, gainDb: +0.8, q: 1.2 },
+    ],
+    multiband: {
+      xoversHz: MB_XOVERS,
+      bands: [
+        { ratio: 2.8, thresholdDb: -26, kneeDb: 3, attackSec: 0.025, releaseSec: 0.12 },
+        { ratio: 2.2, thresholdDb: -23, kneeDb: 3, attackSec: 0.015, releaseSec: 0.11 },
+        { ratio: 1.5, thresholdDb: -19, kneeDb: 3, attackSec: 0.010, releaseSec: 0.10 },
+        { ratio: 1.4, thresholdDb: -18, kneeDb: 3, attackSec: 0.005, releaseSec: 0.08 },
+        { ratio: 1.3, thresholdDb: -18, kneeDb: 3, attackSec: 0.003, releaseSec: 0.07 },
+      ]
+    },
+    stereo: { monoBelowHz: 120, widthHighOnly: { freq: 200, width: 120 } },
+    output: { ...UNIVERSAL_OUTPUT, limiter: { ...UNIVERSAL_OUTPUT.limiter, thresholdDb: -7 } },
+  },
+
+  // ---- Lo-fi: narrow bandwidth + darker top ----
+  lofi: {
+    eq: [
+      { type: 'hpf', freq: 120, order: 2, q: 0.707 },
+      { type: 'highshelf', freq: 4500, gainDb: -6.0, q: 0.7 },
+      { type: 'bell', freq: 900, gainDb: -2.0, q: 1.2 },
+    ],
+    multiband: {
+      xoversHz: MB_XOVERS,
+      bands: [
+        { ratio: 3.5, thresholdDb: -28, kneeDb: 3, attackSec: 0.020, releaseSec: 0.14 },
+        { ratio: 2.5, thresholdDb: -25, kneeDb: 3, attackSec: 0.015, releaseSec: 0.13 },
+        { ratio: 1.8, thresholdDb: -22, kneeDb: 3, attackSec: 0.010, releaseSec: 0.12 },
+        { ratio: 1.6, thresholdDb: -20, kneeDb: 3, attackSec: 0.006, releaseSec: 0.10 },
+        { ratio: 1.5, thresholdDb: -20, kneeDb: 3, attackSec: 0.004, releaseSec: 0.09 },
+      ]
+    },
+    stereo: { monoBelowHz: 150, overallWidth: 95 },
+    output: { ...UNIVERSAL_OUTPUT, limiter: { ...UNIVERSAL_OUTPUT.limiter, thresholdDb: -8 } },
+  },
+
+  // ---- Neo Soul: warm mids + subtle width ----
+  neosoul: {
+    eq: [
+      { type: 'hpf', freq: 35, order: 2, q: 0.707 },
+      { type: 'lowshelf', freq: 120, gainDb: +1.0, q: 0.9 },
+      { type: 'bell', freq: 1100, gainDb: +1.5, q: 1.1 },
+      { type: 'highshelf', freq: 11000, gainDb: +0.5, q: 0.7 },
+    ],
+    multiband: {
+      xoversHz: MB_XOVERS,
+      bands: [
+        { ratio: 2.4, thresholdDb: -25, kneeDb: 3, attackSec: 0.030, releaseSec: 0.16 },
+        { ratio: 2.0, thresholdDb: -23, kneeDb: 3, attackSec: 0.020, releaseSec: 0.15 },
+        { ratio: 1.5, thresholdDb: -20, kneeDb: 3, attackSec: 0.012, releaseSec: 0.13 },
+        { ratio: 1.35, thresholdDb: -18, kneeDb: 3, attackSec: 0.008, releaseSec: 0.11 },
+        { ratio: 1.25, thresholdDb: -18, kneeDb: 3, attackSec: 0.005, releaseSec: 0.10 },
+      ]
+    },
+    stereo: { monoBelowHz: 120, overallWidth: 115 },
+    output: UNIVERSAL_OUTPUT,
+  },
+
+  // ---- Festival: maximum energy + harder clamp ----
+  festival: {
+    eq: [
+      { type: 'hpf', freq: 30, order: 2, q: 0.707 },
+      { type: 'lowshelf', freq: 50, gainDb: +1.5, q: 0.8 },
+      { type: 'bell', freq: 250, gainDb: -2.5, q: 2.0 },
+      { type: 'bell', freq: 3200, gainDb: -1.0, q: 2.5 },
+      { type: 'highshelf', freq: 11000, gainDb: +1.0, q: 0.7 },
+    ],
+    multiband: {
+      xoversHz: MB_XOVERS,
+      bands: [
+        { ratio: 6.0, thresholdDb: -30, kneeDb: 3, attackSec: 0.020, releaseSec: 0.10 },
+        { ratio: 3.5, thresholdDb: -26, kneeDb: 3, attackSec: 0.012, releaseSec: 0.10 },
+        { ratio: 2.0, thresholdDb: -22, kneeDb: 3, attackSec: 0.008, releaseSec: 0.09 },
+        { ratio: 1.8, thresholdDb: -20, kneeDb: 3, attackSec: 0.004, releaseSec: 0.07 },
+        { ratio: 1.6, thresholdDb: -20, kneeDb: 3, attackSec: 0.002, releaseSec: 0.06 },
+      ]
+    },
+    stereo: { monoBelowHz: 100, widthHighOnly: { freq: 5000, width: 130 } },
+    output: { ...UNIVERSAL_OUTPUT, limiter: { ...UNIVERSAL_OUTPUT.limiter, thresholdDb: -9 } },
+  },
+
+  // ---- Focus: tighter stereo + punch ----
+  focus: {
+    stereo: { monoBelowHz: 140, overallWidth: 95 },
+    output: UNIVERSAL_OUTPUT,
+  },
+
+  // ---- Immersive: more width, safe mono below ----
+  immersive: {
+    stereo: { monoBelowHz: 120, overallWidth: 118 },
+    output: UNIVERSAL_OUTPUT,
+  },
+
+  // ---- Wide: extreme width ----
+  wide: {
+    stereo: { monoBelowHz: 120, overallWidth: 125 },
+    output: UNIVERSAL_OUTPUT,
+  },
+
+  // ---- Vocal Forward: presence bump, mud cut ----
+  vocalforward: {
+    eq: [
+      { type: 'hpf', freq: 35, order: 2, q: 0.707 },
+      { type: 'bell', freq: 250, gainDb: -2.0, q: 1.6 },
+      { type: 'bell', freq: 2200, gainDb: +2.5, q: 1.4 },
+      { type: 'bell', freq: 3800, gainDb: +1.5, q: 1.6 },
+      { type: 'highshelf', freq: 12000, gainDb: +0.5, q: 0.7 },
+    ],
+    multiband: {
+      xoversHz: MB_XOVERS,
+      bands: [
+        { ratio: 2.8, thresholdDb: -26, kneeDb: 3, attackSec: 0.025, releaseSec: 0.12 },
+        { ratio: 2.2, thresholdDb: -24, kneeDb: 3, attackSec: 0.015, releaseSec: 0.11 },
+        { ratio: 1.6, thresholdDb: -21, kneeDb: 3, attackSec: 0.010, releaseSec: 0.10 },
+        { ratio: 1.5, thresholdDb: -19, kneeDb: 3, attackSec: 0.006, releaseSec: 0.08 },
+        { ratio: 1.4, thresholdDb: -19, kneeDb: 3, attackSec: 0.003, releaseSec: 0.07 },
+      ]
+    },
+    stereo: { monoBelowHz: 120, overallWidth: 110 },
+    output: UNIVERSAL_OUTPUT,
+  },
+
+  // ---- Smooth Mids: velvet response ----
   smoothmids: {
     eq: [
       { type: 'hpf', freq: 40, order: 2, q: 0.707 },
@@ -220,6 +439,8 @@ const EXACT_PRESETS: Partial<Record<keyof typeof presets, Partial<PresetDSP>>> =
     stereo: { monoBelowHz: 120, widthHighOnly: { freq: 150, width: 110 } },
     output: UNIVERSAL_OUTPUT,
   },
+
+  // ---- Dynamic: preserve transients (lighter comp) ----
   dynamic: {
     eq: [
       { type: 'hpf', freq: 35, order: 2, q: 0.707 },
@@ -228,16 +449,18 @@ const EXACT_PRESETS: Partial<Record<keyof typeof presets, Partial<PresetDSP>>> =
     multiband: {
       xoversHz: MB_XOVERS,
       bands: [
-        { ratio: 3.0, thresholdDb: -26, kneeDb: 3, attackSec: 0.025, releaseSec: 0.12 },
-        { ratio: 2.0, thresholdDb: -22, kneeDb: 3, attackSec: 0.015, releaseSec: 0.11 },
-        { ratio: 1.6, thresholdDb: -20, kneeDb: 3, attackSec: 0.010, releaseSec: 0.10 },
-        { ratio: 1.5, thresholdDb: -18, kneeDb: 3, attackSec: 0.005, releaseSec: 0.08 },
-        { ratio: 1.4, thresholdDb: -18, kneeDb: 3, attackSec: 0.002, releaseSec: 0.06 },
+        { ratio: 2.0, thresholdDb: -24, kneeDb: 3, attackSec: 0.030, releaseSec: 0.15 },
+        { ratio: 1.6, thresholdDb: -22, kneeDb: 3, attackSec: 0.020, releaseSec: 0.14 },
+        { ratio: 1.3, thresholdDb: -20, kneeDb: 3, attackSec: 0.015, releaseSec: 0.12 },
+        { ratio: 1.25, thresholdDb: -18, kneeDb: 3, attackSec: 0.010, releaseSec: 0.10 },
+        { ratio: 1.2, thresholdDb: -18, kneeDb: 3, attackSec: 0.006, releaseSec: 0.09 },
       ]
     },
     stereo: { monoBelowHz: 120, overallWidth: 115 },
     output: { ...UNIVERSAL_OUTPUT, limiter: { ...UNIVERSAL_OUTPUT.limiter, thresholdDb: -7 } },
   },
+
+  // ---- Max Impact: heavier bus comp + wider highs ----
   maximpact: {
     eq: [
       { type: 'lowshelf', freq: 60, gainDb: +1.0, q: 1.0 },
@@ -266,47 +489,13 @@ const EXACT_PRESETS: Partial<Record<keyof typeof presets, Partial<PresetDSP>>> =
     stereo: { monoBelowHz: 120, widthHighOnly: { freq: 4000, width: 125 } },
     output: { ...UNIVERSAL_OUTPUT, limiter: { ...UNIVERSAL_OUTPUT.limiter, thresholdDb: -8 } },
   },
-  modern: {
-    eq: [
-      { type: 'bell', freq: 300, gainDb: -1.5, q: 2.0 },
-      { type: 'highshelf', freq: 12000, gainDb: +2.0, q: 0.7 },
-    ],
-    multiband: {
-      xoversHz: MB_XOVERS,
-      bands: [
-        { ratio: 2.5, thresholdDb: -25, kneeDb: 3, attackSec: 0.025, releaseSec: 0.12 },
-        { ratio: 2.0, thresholdDb: -22, kneeDb: 3, attackSec: 0.015, releaseSec: 0.11 },
-        { ratio: 1.5, thresholdDb: -19, kneeDb: 3, attackSec: 0.010, releaseSec: 0.10 },
-        { ratio: 1.4, thresholdDb: -18, kneeDb: 3, attackSec: 0.005, releaseSec: 0.08 },
-        { ratio: 1.3, thresholdDb: -18, kneeDb: 3, attackSec: 0.002, releaseSec: 0.06 },
-      ]
-    },
-    stereo: { monoBelowHz: 120, widthHighOnly: { freq: 200, width: 120 } },
-    output: { ...UNIVERSAL_OUTPUT, limiter: { ...UNIVERSAL_OUTPUT.limiter, thresholdDb: -7 } },
-  },
-  festival: {
-    eq: [
-      { type: 'lowshelf', freq: 50, gainDb: +1.5, q: 0.8 },
-      { type: 'bell', freq: 250, gainDb: -2.5, q: 2.0 },
-      { type: 'highshelf', freq: 11000, gainDb: +1.0, q: 0.7 },
-      { type: 'bell', freq: 3200, gainDb: -1.0, q: 2.5 },
-    ],
-    multiband: {
-      xoversHz: MB_XOVERS,
-      bands: [
-        { ratio: 5.0, thresholdDb: -28, kneeDb: 3, attackSec: 0.025, releaseSec: 0.12 },
-        { ratio: 3.0, thresholdDb: -24, kneeDb: 3, attackSec: 0.015, releaseSec: 0.11 },
-        { ratio: 1.8, thresholdDb: -20, kneeDb: 3, attackSec: 0.010, releaseSec: 0.10 },
-        { ratio: 1.6, thresholdDb: -18, kneeDb: 3, attackSec: 0.005, releaseSec: 0.08 },
-        { ratio: 1.4, thresholdDb: -18, kneeDb: 3, attackSec: 0.002, releaseSec: 0.06 },
-      ]
-    },
-    stereo: { monoBelowHz: 100, widthHighOnly: { freq: 5000, width: 130 } },
-    output: { ...UNIVERSAL_OUTPUT, limiter: { ...UNIVERSAL_OUTPUT.limiter, thresholdDb: -9 } },
-  },
+
+  // ---- BigCappo: keep your special flag, rest comes from slider mapping + warmthTrim node ----
   bigcappo: {
     special: "bigcappo",
-  }
+    stereo: { monoBelowHz: 120, overallWidth: 112 },
+    output: UNIVERSAL_OUTPUT,
+  },
 };
 
 // ---------- Map "slider presets" into deterministic DSP (for all other presets) ----------
@@ -810,6 +999,7 @@ async function renderPresetGraph(
 }
 
 async function processAudioPremium(audioBuffer: AudioBuffer, presetKey: keyof typeof presets, useAutoTune = false) {
+  const AUDITION_MODE = true;
   const dsp = buildDSPForPreset(presetKey);
 
   // Pass 1: render without output so the analysis is honest
@@ -818,16 +1008,23 @@ async function processAudioPremium(audioBuffer: AudioBuffer, presetKey: keyof ty
   const integrated = await computeIntegratedLUFS_KWeighted(pre);
   const tpPre = estimateTruePeakDbFS(pre, 4);
 
-  // Trim to hit -14 integrated
-  let trimDb = dsp.output.targetIntegratedLUFS - integrated;
+  // Trim to hit -14 integrated (unless auditioning)
+  let trimDb = 0;
 
-  // Enforce ceiling safety after trim
-  const predictedTP = tpPre + trimDb;
-  if (predictedTP > dsp.output.ceilingDbFS) {
-    trimDb = Math.min(trimDb, dsp.output.ceilingDbFS - tpPre);
+  if (!AUDITION_MODE) {
+    trimDb = dsp.output.targetIntegratedLUFS - integrated;
+
+    // Enforce ceiling safety after trim
+    const predictedTP = tpPre + trimDb;
+    if (predictedTP > dsp.output.ceilingDbFS) {
+      trimDb = Math.min(trimDb, dsp.output.ceilingDbFS - tpPre);
+    }
+
+    trimDb = clamp(trimDb, dsp.output.trimClampDb.min, dsp.output.trimClampDb.max);
+  } else {
+    // Audition mode: no loudness matching, just keep it safe.
+    trimDb = 0;
   }
-
-  trimDb = clamp(trimDb, dsp.output.trimClampDb.min, dsp.output.trimClampDb.max);
 
   // Pass 2: render final with trim + limiter + ceiling
   const final = await renderPresetGraph(audioBuffer, dsp, useAutoTune, 'final', trimDb);
