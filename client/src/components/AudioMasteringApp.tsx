@@ -835,7 +835,7 @@ async function processAudioPremium(audioBuffer: AudioBuffer, presetKey: keyof ty
   return final;
 }
 
-// ---------- WAV export ----------
+// ---------- WAV + MP3 export ----------
 const bufferToWav = (buffer: AudioBuffer) => {
   const numberOfChannels = buffer.numberOfChannels;
   const length = buffer.length * numberOfChannels * 2;
@@ -871,6 +871,50 @@ const bufferToWav = (buffer: AudioBuffer) => {
 
   return new Blob([arrayBuffer], { type: 'audio/wav' });
 };
+
+async function bufferToMp3IfAvailable(buffer: AudioBuffer, kbps = 320): Promise<Blob | null> {
+  // Dynamic import so this file still builds even if lamejs isn't installed.
+  const lame = (await import('lamejs').catch(() => null)) as any;
+  if (!lame?.Mp3Encoder) return null;
+
+  const sampleRate = buffer.sampleRate;
+  const numChannels = buffer.numberOfChannels;
+
+  const toInt16 = (f: Float32Array) => {
+    const out = new Int16Array(f.length);
+    for (let i = 0; i < f.length; i++) {
+      const s = Math.max(-1, Math.min(1, f[i]));
+      out[i] = s < 0 ? (s * 0x8000) : (s * 0x7fff);
+    }
+    return out;
+  };
+
+  const left = toInt16(buffer.getChannelData(0));
+  const right = numChannels > 1 ? toInt16(buffer.getChannelData(1)) : null;
+
+  const enc = new lame.Mp3Encoder(numChannels, sampleRate, kbps);
+  const chunkSize = 1152;
+  const mp3Data: Uint8Array[] = [];
+
+  for (let i = 0; i < left.length; i += chunkSize) {
+    const l = left.subarray(i, i + chunkSize);
+
+    let mp3buf: Uint8Array;
+    if (numChannels === 2 && right) {
+      const r = right.subarray(i, i + chunkSize);
+      mp3buf = enc.encodeBuffer(l, r);
+    } else {
+      mp3buf = enc.encodeBuffer(l);
+    }
+
+    if (mp3buf.length > 0) mp3Data.push(mp3buf);
+  }
+
+  const end = enc.flush();
+  if (end.length > 0) mp3Data.push(end);
+
+  return new Blob(mp3Data, { type: 'audio/mpeg' });
+}
 
 // ============================================================
 // =====================  UI COMPONENT  =======================
@@ -1086,18 +1130,35 @@ export default function AudioMasteringApp() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const exportAudio = async () => {
+  const exportAudio = async (format: 'wav' | 'mp3' = 'wav') => {
     if (!processedBuffer || !file) return;
     setIsProcessing(true);
     try {
-      const blob = bufferToWav(processedBuffer);
+      let blob: Blob;
+
+      if (format === 'wav') {
+        blob = bufferToWav(processedBuffer);
+      } else {
+        const mp3 = await bufferToMp3IfAvailable(processedBuffer, 320);
+        if (!mp3) {
+          toast({
+            title: "MP3 Export Not Installed",
+            description: "Install 'lamejs' to export real MP3. WAV export works right now.",
+            variant: "destructive"
+          });
+          return;
+        }
+        blob = mp3;
+      }
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `trapmaster-pro-${selectedPreset}-${file.name.split('.')[0]}.wav`;
+      a.download = `trapmaster-pro-${selectedPreset}-${file.name.split('.')[0]}.${format}`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1500);
-      toast({ title: "Export Complete", description: "Mastered WAV saved to Downloads" });
+
+      toast({ title: "Export Started", description: `${format.toUpperCase()} download started.` });
     } catch (e) {
       console.error(e);
       toast({ title: "Export Error", description: "System failure during bounce.", variant: "destructive" });
@@ -1267,14 +1328,20 @@ export default function AudioMasteringApp() {
                 ))}
               </div>
 
-              <div className="pt-6">
+              <div className="pt-6 grid grid-cols-2 gap-4">
                 <button
-                  onClick={exportAudio}
-                  disabled={isProcessing || !processedBuffer}
-                  className="w-full p-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-[2rem] font-black text-sm uppercase tracking-widest hover:from-purple-600 hover:to-pink-600 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => exportAudio('wav')}
+                  className="p-6 bg-[#0a0a0a] border border-white/5 rounded-[2rem] font-black text-[10px] uppercase tracking-widest hover:bg-white/5 transition-all flex flex-col items-center gap-3 group"
                 >
-                  <Download className="w-6 h-6" />
-                  Export Mastered WAV
+                  <Download className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
+                  HD WAV
+                </button>
+                <button
+                  onClick={() => exportAudio('mp3')}
+                  className="p-6 bg-[#0a0a0a] border border-white/5 rounded-[2rem] font-black text-[10px] uppercase tracking-widest hover:bg-white/5 transition-all flex flex-col items-center gap-3 group"
+                >
+                  <Download className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
+                  Hi-Fi MP3
                 </button>
               </div>
 
