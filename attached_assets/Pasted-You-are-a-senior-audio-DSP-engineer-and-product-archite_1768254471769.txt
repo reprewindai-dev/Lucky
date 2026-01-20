@@ -1,0 +1,149 @@
+You are a senior audio DSP engineer and product architect building a commercial mastering engine called TrapMasterPro.
+
+This is NOT a general-purpose plugin.
+This engine is EXCLUSIVELY for:
+Trap-Soul, Trap, Urban, Hip-Hop.
+
+ABSOLUTE GOAL:
+Create a deep, adaptive preset engine where every preset:
+- Sounds audibly different
+- Feels emotionally different
+- Solves a specific mix problem
+- Works on FULL MIXES ONLY (vocals + beat together)
+
+DO NOT build vocal-only chains.
+DO NOT assume stems.
+DO NOT create static presets.
+
+--------------------------------------------------
+ENGINE ARCHITECTURE (REQUIRED)
+--------------------------------------------------
+
+1. GLOBAL ANALYSIS PASS (no audio changes)
+Analyze input audio for:
+- Integrated & short-term LUFS
+- Dynamic range / crest factor
+- Spectral balance (low / mid / high)
+- Vocal dominance (1–4 kHz presence)
+- Harshness zones (2.5–6 kHz)
+- Mud zones (150–350 Hz)
+- Bass stability (30–120 Hz)
+- Stereo correlation / mono safety
+
+This analysis feeds ALL presets.
+
+--------------------------------------------------
+2. PRESET PERSONALITY SYSTEM (MANDATORY)
+--------------------------------------------------
+
+Each preset must define:
+- Intent (what problem it solves)
+- Allowed aggression level
+- Priority frequency regions
+- Dynamic behavior (static vs adaptive)
+- Stereo behavior (mid/side rules)
+- Loudness bias (if any)
+
+You MUST enforce audible contrast between presets.
+If two presets sound similar, redesign one.
+
+--------------------------------------------------
+3. REQUIRED PRESETS (FULL MIX)
+--------------------------------------------------
+
+Build ALL of the following as adaptive, full-mix presets:
+
+- De-Harsh
+- Mud Remover
+- Bass Tamer
+- Vintage Warmth
+- Modern Bright
+- Lo-Fi Character
+- Neo Soul
+- Festival Banger
+- Focus Center
+- Immersive
+- Wide & Spacious
+- Vocal Forward
+- Smooth Mids
+- Dynamic & Clear
+- Maximum Impact
+- BigCappo (Signature Preset)
+
+--------------------------------------------------
+4. BIGCAPPO – SIGNATURE PRESET (CRITICAL)
+--------------------------------------------------
+
+Intent:
+Emotional trap-soul vocals that may be slightly off-key.
+Human, imperfect, expressive. NEVER robotic.
+
+Rules:
+- Pitch correction ONLY when deviation exceeds a defined threshold
+- Slower retune speed
+- Preserve formants
+- Reduce over-auto-tune artifacts
+- Emphasize emotional mids
+- Control harsh highs without dulling
+- Sound “performed”, not “processed”
+
+This preset must feel meaningfully different from all others.
+
+--------------------------------------------------
+5. DSP RULES
+--------------------------------------------------
+
+- Prefer dynamic EQ over static EQ
+- Adaptive compression over fixed thresholds
+- Mono bass below ~120 Hz
+- Stereo width only where safe
+- Soft clipping BEFORE limiting when needed
+- Loudness targets:
+  • Standard presets: ~-9 LUFS
+  • Maximum Impact / Festival Banger: ~-8.5 LUFS max
+- Avoid over-processing at all costs
+
+--------------------------------------------------
+6. A/B AUDIO COMPARISON (SALES FEATURE)
+--------------------------------------------------
+
+Implement instant A/B switching:
+- ORIGINAL audio
+- PRESET audio
+
+Rules:
+- Loudness-matched comparison (mandatory)
+- Zero latency toggle
+- No misleading volume differences
+
+--------------------------------------------------
+7. UI INTENT (SUPPORTING)
+--------------------------------------------------
+
+UI should show:
+- Preset name
+- One-line intent description
+- A/B toggle
+- Loudness meter
+- Export options (WAV + MP3)
+
+Minimal. Modern. Trust-focused.
+
+--------------------------------------------------
+DELIVERABLES
+--------------------------------------------------
+
+You must provide:
+- Adaptive DSP logic per preset
+- Clear differentiation rationale
+- Preset behavior rules
+- A/B comparison logic
+- Export pipeline logic
+
+DO NOT:
+- Copy proprietary algorithms
+- Reference brand internals
+- Create generic or overlapping presets
+
+This is a real, sellable product.
+Build it accordingly.
